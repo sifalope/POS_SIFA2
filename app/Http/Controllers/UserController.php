@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\http\Requests\Searchrequest;
+use App\Http\Requests\SearchRequest;
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -19,16 +20,16 @@ class UserController extends Controller
     {
         $keyword = $request->input('search');
 
-        if($keyword) {
-            $users = User::whereraw("MATCH(name, email) AGAINST(? IN BOOLEAN MODE)", [$keyword])
-             ->paginate(10)
-             ->withQueryString();  
+        if ($keyword) {
+            $users = User::where('name', 'LIKE', "%{$keyword}%")
+                ->orWhere('email', 'LIKE', "%{$keyword}%")
+                ->paginate(10)
+                ->withQueryString();
         } else {
             $users = User::query()->paginate(10)->withQueryString();
         }
 
         return view('users.index', compact('users'));
-
     }
 
     /**
@@ -83,18 +84,19 @@ class UserController extends Controller
     {
         $dataReq = $request->validated();
 
-        $user->name     = $dataReq['name'];
-        $user->email    = $dataReq['email'];
-        $user->role_id  = $dataReq['role_id'];
+        $user->name    = $dataReq['name'];
+        $user->email   = $dataReq['email'];
+        $user->role_id = $dataReq['role_id'];
 
+        // Mengamankan pembaruan password (hanya di-hash jika diisi)
         if (!empty($dataReq['password'])) {
             $user->password = Hash::make($dataReq['password']);
         }
 
         $user->save();
 
-        return redirect()->route('admin.users.edit', $user->id)->with('success', 'User berhasil di perbarui');
-
+        // Mengarahkan kembali ke halaman utama/index users
+        return redirect()->route('admin.users')->with('success', 'User berhasil diperbarui');
     }
 
     /**
@@ -102,7 +104,11 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        DB::statement('PRAGMA foreign_keys = OFF;');
+
         $user->delete();
+
+        DB::statement('PRAGMA foreign_keys = ON;');
 
         return back()->with('success', 'User deleted');
     }

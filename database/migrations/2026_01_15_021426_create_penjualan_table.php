@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('penjualan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users', 'id')->restrictOnDelete();
+            // Perbaikan: restrictOnDelete() diganti menjadi cascadeOnDelete() 
+            // agar data penjualan milik user otomatis ikut terhapus saat user dihapus.
+            $table->foreignId('user_id')->constrained('users', 'id')->cascadeOnDelete();
             $table->integer('total_pembayaran');
             $table->string('metode_pembayaran');
-            $table->enum('status', ['OPEN','COMPLETED']);
+            $table->enum('status', ['OPEN', 'COMPLETED']);
             $table->timestamps();
         });
     }

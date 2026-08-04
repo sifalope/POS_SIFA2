@@ -1,49 +1,37 @@
 <?php
 
-namespace App\Http\Requests\Produk;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'name' => 'required|string|max:255',
-            'purchase_price' => 'required|integer|min:0',
-            'selling_price' => 'required|integer|min:0',
-            'stock' => 'required|integer|min:0',
+            'name'     => 'required|string|max:100',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:8',
+            'role_id'  => 'required',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'foto.image'        => 'File yang diupload harus gambar.',
-            'foto.mimes'        => 'Extensi gambar harus JPG, JPEG, PNG.',
-            'foto.max'          => 'Maksimal ukuran gambar 2mb',
-            'name.required'     => 'Nama wajib diisi',
+            'name.required'     => 'Nama wajib diisi.',
+            'name.max'          => 'Maksimal panjang nama 100 karakter.',
+            'email.required'    => 'Email wajib diisi.',
             'email.email'       => 'Format email tidak valid.',
-            'purchase.price.required'  => 'purchase price wajib diisi.',
-            'purchase_price.integer'   => 'purchase price harus diisi bilangan bulat.',
-            'selling_price.required'   => 'selling price wajib diisi.',
-            'selling_price.integer'    => 'selling price wajib diisi.',
-            'stock.required'           => 'Stock wajib diisi.',
-            'stock.integer'            => 'Stock harus diisi angka.',
+            'email.unique'      => 'Email ini sudah terdaftar.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min'      => 'Password minimal :min karakter.',
+            'role_id.required'  => 'Role wajib diisi.',
         ];
     }
 }

@@ -105,288 +105,105 @@
     }
 </style>
 
-
 <div class="container">
+    <div class="edit-card-container">
+        <div class="edit-card">
 
-<div class="edit-card-container">
+            <h3 class="page-title">Edit Produk</h3>
 
-<div class="edit-card">
+            <form action="{{ route('produk.update', $produk->id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
 
-<h3 class="page-title">
-    Edit Produk
-</h3>
+                {{-- FOTO SAAT INI --}}
+                <div class="mb-4">
+                    <label class="form-label-pink d-block">Foto Saat Ini</label>
+                    <div class="photo-preview-box">
+                        @if($produk->foto && Storage::disk('public')->exists($produk->foto))
+                            <img src="{{ asset('storage/'.$produk->foto) }}">
+                        @else
+                            <span class="no-img-text">Tidak Ada Foto</span>
+                        @endif
+                    </div>
+                </div>
 
+                {{-- UPLOAD FOTO BARU --}}
+                <div class="mb-3">
+                    <label class="form-label-pink">Pilih Gambar Baru (Opsional)</label>
+                    <input type="file"
+                           name="foto"
+                           id="foto"
+                           class="form-control form-control-pink input-file-pink"
+                           accept="image/*">
 
-<form action="{{ route('produk.update',$produk->id) }}" method="POST" enctype="multipart/form-data">
+                    @error('foto')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
 
-@csrf
-@method('PUT')
+                {{-- NAMA PRODUK --}}
+                <div class="mb-3">
+                    <label class="form-label-pink">Nama Produk</label>
+                    <input type="text"
+                           name="name"
+                           class="form-control form-control-pink"
+                           value="{{ old('name', $produk->nama) }}"
+                           required>
 
+                    @error('name')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
 
-<div class="row mb-4">
+                {{-- HARGA BELI --}}
+                <div class="mb-3">
+                    <label class="form-label-pink">Harga Beli</label>
+                    <input type="number"
+                           name="purchase_price"
+                           class="form-control form-control-pink"
+                           value="{{ old('purchase_price', $produk->harga_beli) }}"
+                           required>
 
-<div class="col-6">
+                    @error('purchase_price')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
 
-<label class="form-label-pink d-block">
-Foto Saat Ini
-</label>
+                {{-- HARGA JUAL --}}
+                <div class="mb-3">
+                    <label class="form-label-pink">Harga Jual</label>
+                    <input type="number"
+                           name="selling_price"
+                           class="form-control form-control-pink"
+                           value="{{ old('selling_price', $produk->harga_jual) }}"
+                           required>
 
+                    @error('selling_price')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
 
-<div class="photo-preview-box">
+                {{-- STOK --}}
+                <div class="mb-4">
+                    <label class="form-label-pink">Stok</label>
+                    <input type="number"
+                           name="stok"
+                           class="form-control form-control-pink"
+                           value="{{ old('stok', $produk->stok) }}"
+                           required>
 
-@if($produk->foto && Storage::disk('public')->exists($produk->foto))
+                    @error('stok')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
 
-<img src="{{ asset('storage/'.$produk->foto) }}">
+                <button type="submit" class="btn btn-pink-submit">Simpan Perubahan</button>
+                <a href="{{ route('produk.index') }}" class="btn btn-pink-outline">Kembali</a>
 
-@else
+            </form>
 
-<span class="no-img-text">
-Tidak Ada Foto
-</span>
-
-@endif
-
+        </div>
+    </div>
 </div>
-
-</div>
-
-
-
-<div class="col-6">
-
-<label class="form-label-pink d-block">
-Preview Foto Baru
-</label>
-
-
-<div class="photo-preview-box">
-
-<img id="imgPreview" style="display:none">
-
-<span id="previewPlaceholder" class="no-img-text">
-Belum Dipilih
-</span>
-
-</div>
-
-
-</div>
-
-</div>
-
-
-
-
-{{-- FOTO --}}
-
-<div class="mb-3">
-
-<label class="form-label-pink">
-Pilih Gambar Baru
-</label>
-
-
-<input type="file"
-name="foto"
-id="foto"
-class="form-control form-control-pink input-file-pink"
-accept="image/*"
-onchange="previewImage(event)">
-
-
-@error('foto')
-<small class="text-danger">
-{{ $message }}
-</small>
-@enderror
-
-
-</div>
-
-
-
-
-
-{{-- NAMA --}}
-
-<div class="mb-3">
-
-<label class="form-label-pink">
-Nama Produk
-</label>
-
-
-<input type="text"
-name="nama"
-class="form-control form-control-pink"
-value="{{ old('nama',$produk->nama) }}"
-required>
-
-
-@error('nama')
-
-<small class="text-danger">
-{{ $message }}
-</small>
-
-@enderror
-
-
-</div>
-
-
-
-
-
-{{-- HARGA BELI --}}
-
-<div class="mb-3">
-
-<label class="form-label-pink">
-Harga Beli
-</label>
-
-
-<input type="number"
-name="harga_beli"
-class="form-control form-control-pink"
-value="{{ old('harga_beli',$produk->harga_beli) }}"
-required>
-
-
-@error('harga_beli')
-
-<small class="text-danger">
-{{ $message }}
-</small>
-
-@enderror
-
-
-</div>
-
-
-
-
-
-{{-- HARGA JUAL --}}
-
-<div class="mb-3">
-
-<label class="form-label-pink">
-Harga Jual
-</label>
-
-
-<input type="number"
-name="harga_jual"
-class="form-control form-control-pink"
-value="{{ old('harga_jual',$produk->harga_jual) }}"
-required>
-
-
-@error('harga_jual')
-
-<small class="text-danger">
-{{ $message }}
-</small>
-
-@enderror
-
-
-</div>
-
-
-
-
-
-{{-- STOK --}}
-
-<div class="mb-4">
-
-<label class="form-label-pink">
-Stok
-</label>
-
-
-<input type="number"
-name="stok"
-class="form-control form-control-pink"
-value="{{ old('stok',$produk->stok) }}"
-required>
-
-
-@error('stok')
-
-<small class="text-danger">
-{{ $message }}
-</small>
-
-@enderror
-
-
-</div>
-
-
-
-
-<button type="submit" class="btn btn-pink-submit">
-Simpan Perubahan
-</button>
-
-
-<a href="{{ route('produk.index') }}" class="btn btn-pink-outline">
-Kembali
-</a>
-
-
-</form>
-
-
-</div>
-
-</div>
-
-</div>
-
-
-
-
-<script>
-
-function previewImage(event){
-
-let input = event.target;
-
-let preview = document.getElementById('imgPreview');
-
-let placeholder = document.getElementById('previewPlaceholder');
-
-
-if(input.files && input.files[0]){
-
-
-let reader = new FileReader();
-
-
-reader.onload=function(e){
-
-preview.src=e.target.result;
-
-preview.style.display='block';
-
-placeholder.style.display='none';
-
-}
-
-
-reader.readAsDataURL(input.files[0]);
-
-}
-
-}
-
-</script>
-
 
 @endsection

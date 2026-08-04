@@ -147,7 +147,7 @@
                 <span class="info-value">{{ $produk->user->name ?? $produk->penginput ?? 'Admin' }}</span>
             </div>
 
-            <a href="{{ route('admin.produk.index') }}" class="btn-pink-back">
+            <a href="{{ route('produk.index') }}" class="btn-pink-back">
                 &larr; Kembali
             </a>
         </div>

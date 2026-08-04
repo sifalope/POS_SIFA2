@@ -6,8 +6,8 @@
 
 @include('layouts.navbar')
 
-     <style>
-  /* Background halaman produk */
+<style>
+/* Background halaman produk */
 body {
     background: #fff1f7;
 }
@@ -19,10 +19,8 @@ body {
         #f9f9f9
     );
 
-    box-shadow:
-    0 8px 25px rgba(56,189,248,.25);
+    box-shadow: 0 8px 25px rgba(56,189,248,.25);
 }
-
 
 .navbar-brand {
     color:white !important;
@@ -30,11 +28,9 @@ body {
     font-weight:700;
 }
 
-
 .navbar a {
     color:white !important;
 }
-
 
 .navbar a:hover {
     color:#E0F2FE !important;
@@ -112,57 +108,66 @@ button:hover, .btn:hover {
 }
 </style>
 
-<h1>Halaman Users</h1>
-<a href="{{ route('admin.users.create')}}" class="btn btn-primary mb-3">Create</a>
+<div class="container mt-4">
+    <h1>Halaman Users</h1>
 
-<form action="{{ route('admin.users') }}" method="GET" class="mb-3">
-    <div class="input-group">
-        <input
-            type="text"
-            name="search"
-            value="{{ request('search') }}"
-            class="form-control"
-            placeholder="Search username or email"
-        >
-        <button class="btn btn-outline-secondary" type="submit">
-            Search
-        </button>
-    </div>
-</form>
+    @if (session('success'))
+        <div class="alert alert-success" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+            {{ session('success') }}
+        </div>
+    @endif
 
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Role</th>
-            <th scope="col">Aksi</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($users as $user)
-<tr>
-    <td>{{ $users->firstItem() + $loop->index }}</td>
-    <td>{{ $user->name }}</td>
-    <td>{{ $user->email }}</td>
-    <td>{{ $user->role->name }}</td>
-    <td>
-        <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-warning btn-sm">
-            Edit Akun
-        </a>
-        ||
-        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
-            @csrf
-            @method('DELETE')
-            <button class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus user ini?')">
-                Hapus
+    <a href="{{ route('admin.users.create')}}" class="btn btn-primary mb-3">Create</a>
+
+    <form action="{{ route('admin.users') }}" method="GET" class="mb-3">
+        <div class="input-group">
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                class="form-control"
+                placeholder="Search username or email"
+            >
+            <button class="btn btn-outline-secondary" type="submit">
+                Search
             </button>
-        </form>
-    </td>
-</tr>
-@endforeach
-    </tbody>
-</table>
-{{ $users->links() }}
+        </div>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($users as $user)
+            <tr>
+                <td>{{ $users->firstItem() + $loop->index }}</td>
+                <td>{{ $user->name }}</td>
+                <td>{{ $user->email }}</td>
+                <td>{{ $user->role->name ?? '-' }}</td>
+                <td>
+                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-warning btn-sm">
+                        Edit Akun
+                    </a>
+                    ||
+                    <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus user ini?')">
+                            Hapus
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    {{ $users->links() }}
+</div>
 @endsection

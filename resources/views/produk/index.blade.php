@@ -114,8 +114,14 @@ button:hover, .btn:hover {
 
 <h1>Selamat Datang Di Halaman Produk</h1>
 
+@if (session('success'))
+    <div class="alert alert-success" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+        {{ session('success') }}
+    </div>
+@endif
+
 @can('create', App\Models\Produk::class)
- <a href="{{ route('produk.create') }}"method="GET" class="btn btn-primary mb-3">create</a>
+ <a href="{{ route('produk.create') }}" class="btn btn-primary mb-3">create</a>
 @endcan
 
 <form action="{{ route('produk.index') }}" method="GET" class="mb-3">
@@ -123,7 +129,7 @@ button:hover, .btn:hover {
     <input 
       type="text"
       name="search"
-      value=""
+      value="{{ request('search') }}"
       class="form-control"
       placeholder="Search nama produk"
     >
@@ -151,7 +157,7 @@ button:hover, .btn:hover {
     @forelse ($products as $product)
       <tr>
         <th scope="row">{{ $products->firstItem() + $loop->index }}</th>
-        <td>{{ $product->user->name }}</td>
+        <td>{{ $product->user?->name ?? '-' }}</td>
         <td>
               <img src="{{ asset('storage/' . $product->foto) }}" 
                   width="100"
@@ -166,7 +172,6 @@ button:hover, .btn:hover {
           @can('update', $product)
            <a href="{{ route('produk.edit', $product) }}" class="btn btn-warning ">Edit</a>
           @endcan
-          |||
         @can('delete', $product)
           <form action="{{ route('produk.destroy', $product) }}" method="POST" class="d-inline">
             @csrf

@@ -9,13 +9,13 @@ use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\UserController;
 
 
-//route yang bisa diakses ketika user login
+// Route yang bisa diakses ketika user BELUM login (guest)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'index'])->name('login');
     Route::post('/auth', [AuthController::class, 'auth'])->name('auth');
 });
 
-//route yang bisa diakses ketika user sudah login
+// Route yang bisa diakses ketika user SUDAH login
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -25,8 +25,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
         Route::get('/users/edit/{user}', [UserController::class, 'edit'])->name('users.edit');
-        Route::post('/users/update/{user}', [UserController::class, 'update'])->name('users.update');
-        Route::delete('/users/destroy{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        
+        // PERBAIKAN: Diubah dari Route::post menjadi Route::put
+        Route::put('/users/update/{user}', [UserController::class, 'update'])->name('users.update');
+        
+        Route::delete('/users/destroy/{user}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::resource('/produk', ProdukController::class);
     });
 
