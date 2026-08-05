@@ -112,7 +112,7 @@ button:hover, .btn:hover {
 }
 </style>
 
-<h1>Selamat Datang Di Halaman Produk</h1>
+<h1>Selamat Datang Di Halaman Produk lope</h1>
 
 @if (session('success'))
     <div class="alert alert-success" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 12px; padding: 15px; margin-bottom: 20px;">
