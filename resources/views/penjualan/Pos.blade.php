@@ -167,6 +167,20 @@
         transition: all 0.25s ease;
     }
 
+    .btn-pink-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #fbcfe8;
+        color: #be185d;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 1px solid #f472b6;
+    }
+
     .btn-batal-pink:hover {
         background-color: #ffe4e6;
         color: #be123c;
@@ -347,6 +361,12 @@
             </div>
         </div>
 
+    </div>
+
+     <div class="mt-4">
+        <a href="{{ route('penjualan.index') }}" class="btn-pink-back">
+            &larr; Kembali
+        </a>
     </div>
 
 </div>

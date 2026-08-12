@@ -7,7 +7,7 @@
 @include('layouts.navbar')
 
 <style>
-  /* Background halaman produk */
+/* Background halaman produk */
 body {
     background: #fff1f7;
 }
@@ -19,25 +19,21 @@ body {
         #f9f9f9
     );
 
-    box-shadow:
-    0 8px 25px rgba(56,189,248,.25);
+    box-shadow: 0 8px 25px rgba(56,189,248,.25);
 }
-
 
 .navbar-brand {
-    color:white !important;
-    font-size:24px;
-    font-weight:700;
+    color: white !important;
+    font-size: 24px;
+    font-weight: 700;
 }
-
 
 .navbar a {
-    color:white !important;
+    color: white !important;
 }
 
-
 .navbar a:hover {
-    color:#E0F2FE !important;
+    color: #E0F2FE !important;
 }
 
 /* Judul halaman */
@@ -84,6 +80,7 @@ table tbody td {
     padding: 12px;
     color: #475569;
     border-bottom: 1px solid #fce7f3;
+    vertical-align: middle;
 }
 
 /* Hover baris */
@@ -91,7 +88,7 @@ table tbody tr:hover {
     background: #fff0f6;
 }
 
-/* Tombol aksi */
+/* Tombol dasar */
 button, .btn {
     background: #f472b6;
     color: white;
@@ -103,6 +100,62 @@ button, .btn {
 
 button:hover, .btn:hover {
     background: #ec4899;
+}
+
+/* Custom Tombol Aksi */
+.action-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-pink-detail {
+    background-color: #ec4899;
+    color: white !important;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.btn-pink-detail:hover {
+    background-color: #be185d;
+}
+
+.btn-amber-edit {
+    background-color: #fef08a;
+    color: #854d0e !important;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    border: 1px solid #fde047;
+    transition: all 0.2s ease;
+}
+
+.btn-amber-edit:hover {
+    background-color: #eab308;
+    color: white !important;
+}
+
+.btn-rose-delete {
+    background-color: #fecdd3;
+    color: #9f1239;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    border: 1px solid #fda4af;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-rose-delete:hover {
+    background-color: #e11d48;
+    color: white;
 }
 
 /* Pagination */
@@ -120,7 +173,7 @@ button:hover, .btn:hover {
 
 <h1>Halaman Penjualan</h1>
 
-<a href="{{ route('penjualan.create') }}" class="btn btn-primary mb-3">Create</a>
+<a href="{{ route('penjualan.create') }}" class="btn btn-primary mb-3">Buat Penjualan</a>
 
 <form action="{{ route('penjualan.index') }}" method="GET" class="mb-3">
     <div class="input-group">
@@ -129,10 +182,10 @@ button:hover, .btn:hover {
             name="search"
             value="{{ request()->search }}"
             class="form-control"
-            placeholder="Search penjualan"
+            placeholder="Cari penjualan..."
         >
         <button class="btn btn-outline-secondary" type="submit">
-            Search
+            Cari
         </button>
     </div>
 </form>
@@ -156,30 +209,55 @@ button:hover, .btn:hover {
                 <td>{{ $sales->firstItem() + $loop->index }}</td>
                 <td>{{ $sale->created_at->translatedFormat('d-m-Y H:i:s') }}</td>
                 <td>{{ $sale->user->name ?? '-' }}</td>
-                <td>Rp {{ number_format($sale->total_pembayaran,) }}</td>
+                <td>Rp {{ number_format($sale->total_pembayaran) }}</td>
                 <td>{{ $sale->metode_pembayaran }}</td>
-                <td>{{ $sale->status }}</td>
-                <td class="d-flex gap-1">
-                    <a href="{{ route ('penjualan.show', $sale) }}" class="btn btn-info">Detail</a>
-                    @can('view', $sale)
-                    |||
-                    <a href="" class="btn btn-warning btn-sm">Edit</a> 
-                    |||
-                            |||
-                            <a href="{{ route('penjualan.edit', $sale) }}" method="POST" class="d-inline">
-                        @endcan
+                
+                <td>
+                    @if(strtoupper($sale->status) == 'OPEN')
+                        TERBUKA
+                    @elseif(strtoupper($sale->status) == 'COMPLETED')
+                        SELESAI
+                    @else
+                        {{ $sale->status }}
+                    @endif
+                </td>
+
+                <td>
+                    <div class="action-group">
+                        {{-- Tombol Detail --}}
+                        <a href="{{ route('penjualan.show', $sale) }}" class="btn-pink-detail">
+                            Detail
+                        </a>
                         
-                    </form>
+                        {{-- Tombol Edit & Hapus hanya tampil jika status BUKAN COMPLETED --}}
+                        @if(strtoupper($sale->status) !== 'COMPLETED')
+                            {{-- Tombol Edit --}}
+                            <a href="{{ route('penjualan.edit', $sale) }}" class="btn-amber-edit">
+                                Edit
+                            </a>
+
+                            {{-- Tombol Hapus --}}
+                            <form action="{{ route('penjualan.destroy', $sale) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data penjualan ini?');" style="margin: 0;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-rose-delete">
+                                    Hapus
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </td>
             </tr>
         @empty
             <tr>
-                <td colspan="6" class="text-center">Data Tidak Ditemukan</td>
+                <td colspan="7" class="text-center">Data Tidak Ditemukan</td>
             </tr>
         @endforelse
     </tbody>
 </table>
 
-{{ $sales->links() }}
+<div class="mt-3">
+    {{ $sales->links() }}
+</div>
 
 @endsection

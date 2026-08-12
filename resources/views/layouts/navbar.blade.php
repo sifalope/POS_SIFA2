@@ -7,11 +7,11 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link {{ Request::is('dashboard') ? 'active': ''}}" aria-current="page" href="{{route('dashboard') }}">Dasboard</a>
+          <a class="nav-link {{ Request::is('dashboard') ? 'active': ''}}" aria-current="page" href="{{route('dashboard') }}">Beranda</a>
           
        </li>
         <li class="nav-item">
-          <a class="nav-link {{ Request::is('admin/users') ? 'active': ''}}" href="{{route('admin.users') }}">Users</a>
+          <a class="nav-link {{ Request::is('admin/users') ? 'active': ''}}" href="{{route('admin.users') }}">Pengguna</a>
      </li>
      
         <li class="nav-item">

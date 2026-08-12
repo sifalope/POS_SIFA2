@@ -5,19 +5,19 @@
 @section('content')
 
 <style>
-    /* Background & Layout */
+  
     body {
         background-color: #fff1f7;
     }
 
-    /* Judul & Header */
+    
     .page-title {
         color: #be185d;
         font-weight: 700;
         margin-bottom: 20px;
     }
 
-    /* Card Info Kasir & Ringkasan */
+   
     .card-info {
         background: #ffffff;
         border: 1px solid #fbcfe8;
@@ -31,7 +31,7 @@
         font-weight: 700;
     }
 
-    /* Custom Table Style Soft Pink */
+   
     .table-container {
         background: #ffffff;
         border-radius: 15px;
@@ -70,7 +70,7 @@
         background-color: #fff0f6;
     }
 
-    /* Styling Gambar Produk */
+    
     .img-product {
         width: 50px;
         height: 50px;
@@ -79,7 +79,7 @@
         border: 1px solid #fbcfe8;
     }
 
-    /* Badge Placeholder jika foto kosong */
+   
     .no-img-badge {
         width: 50px;
         height: 50px;
@@ -91,6 +91,28 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    
+    .btn-pink-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #fbcfe8;
+        color: #be185d;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 1px solid #f472b6;
+    }
+
+    .btn-pink-back:hover {
+        background-color: #be185d;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(190, 24, 93, 0.25);
+        transform: translateY(-2px);
     }
 </style>
 
@@ -140,6 +162,12 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ route('penjualan.index') }}" class="btn-pink-back">
+            &larr; Kembali
+        </a>
     </div>
 </div>
 @endsection
