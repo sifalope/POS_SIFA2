@@ -7,6 +7,7 @@ use App\Http\Requests\Produk\StoreRequest;
 use App\Http\Requests\Produk\UpdateRequest;
 use App\Http\Requests\SearchRequest;
 use App\Models\Produk;
+use App\Models\Jenis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +46,11 @@ class ProdukController extends Controller
     public function create()
     {
         $this->authorize('create', Produk::class);
-        return view('produk.create');
+
+        // Ambil data jenis produk dari database
+        $jenis = Jenis::orderBy('nama_jenis')->get();
+
+        return view('produk.create', compact('jenis'));
     }
 
     /**
@@ -59,6 +64,10 @@ class ProdukController extends Controller
 
         $data['user_id'] = Auth::id();
         $data['nama'] = $dataReq['name'];
+
+        // Simpan jenis produk
+        $data['jenis_id'] = $dataReq['jenis_id'];
+
         $data['harga_beli'] = $dataReq['purchase_price'];
         $data['harga_jual'] = $dataReq['selling_price'];
         $data['stok'] = $dataReq['stok'] ?? true;
@@ -89,7 +98,10 @@ class ProdukController extends Controller
     {
         $this->authorize('update', $produk);
 
-        return view('produk.edit', compact('produk'));
+        // Ambil data jenis untuk halaman edit
+        $jenis = Jenis::orderBy('nama_jenis')->get();
+
+        return view('produk.edit', compact('produk', 'jenis'));
     }
 
     /**
@@ -104,6 +116,10 @@ class ProdukController extends Controller
         $data = [
             'user_id' => Auth::id(),
             'nama' => $dataReq['name'],
+
+            // Update jenis produk
+            'jenis_id' => $dataReq['jenis_id'],
+
             'harga_beli' => $dataReq['purchase_price'],
             'harga_jual' => $dataReq['selling_price'],
             'stok' => $dataReq['stok'] ?? true,
@@ -119,6 +135,7 @@ class ProdukController extends Controller
             ) {
                 Storage::disk('public')->delete($produk->foto);
             }
+
             //simpan foto baru
             $data['foto'] = $request->file('foto')->store('products', 'public');  
         }
@@ -138,7 +155,9 @@ class ProdukController extends Controller
         if ($produk->foto) {
             Storage::disk('public')->delete($produk->foto);
         }
+
         $produk->delete();
+
         return redirect()->route('produk.index')->with('success', 'Produk berhasil dihapus.');
     }
 }

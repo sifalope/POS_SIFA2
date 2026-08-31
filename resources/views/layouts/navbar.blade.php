@@ -21,7 +21,12 @@
        <li class="nav-item">
           <a class="nav-link {{ Request::is('penjualan') ? 'active' : '' }}" href="{{ route('penjualan.index') }}">Penjualan</a>
        </li>
-       
+
+       <!-- Menu Tentang Kami !-->
+       <li class="nav-item">
+          <a class="nav-link {{ Request::is('tentang-kami') ? 'active' : '' }}" href="{{ route('tentang.kami') }}">Tentang Kami</a>
+       </li>
+        
     <form class ="position-absolute top-50 start-100 translate-middle" action="{{ route('logout') }}" method="POST">
     @csrf
     <button type="submit" class="btn btn-danger">Logout</button>

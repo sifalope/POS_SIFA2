@@ -121,7 +121,7 @@ button:hover, .btn:hover {
 @endif
 
 @can('create', App\Models\Produk::class)
- <a href="{{ route('produk.create') }}" class="btn btn-primary mb-3">create</a>
+ <a href="{{ route('produk.create') }}" class="btn btn-primary mb-3">Tambah Produk</a>
 @endcan
 
 <form action="{{ route('produk.index') }}" method="GET" class="mb-3">

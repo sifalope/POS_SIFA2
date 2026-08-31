@@ -277,7 +277,7 @@
     </div>
 
     <div class="section-card">
-        <div class="section-title">Best Seller Products</div>
+        <div class="section-title">Produk Terlaris</div>
         <div class="table-responsive">
             <table class="custom-table">
                 <thead>

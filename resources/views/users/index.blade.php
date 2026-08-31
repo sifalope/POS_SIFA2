@@ -117,7 +117,7 @@ button:hover, .btn:hover {
         </div>
     @endif
 
-    <a href="{{ route('admin.users.create')}}" class="btn btn-primary mb-3">Create</a>
+    <a href="{{ route('admin.users.create')}}" class="btn btn-primary mb-3">Tambah User</a>
 
     <form action="{{ route('admin.users') }}" method="GET" class="mb-3">
         <div class="input-group">

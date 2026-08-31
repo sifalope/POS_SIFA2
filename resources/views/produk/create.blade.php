@@ -167,7 +167,7 @@
                     <div id="placeholderText" class="text-center p-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="#f472b6" class="bi bi-image mb-2" viewBox="0 0 16 16">
                             <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                            <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                            <path d="M2.002 1a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12z"/>
                         </svg>
                         <div class="fw-bold" style="color: #be185d; font-size: 14px;">Klik untuk pilih / Unggah Foto</div>
                     </div>
@@ -191,6 +191,35 @@
                 
                 @error('name')
                     <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                @enderror
+            </div>
+
+            {{-- ===== BRAND / JENIS PRODUK ===== --}}
+            <div class="mb-3">
+                <label class="form-label-pink">Brand Produk</label>
+
+                <select name="jenis_id" class="form-control-pink">
+                    <option value="" disabled selected>-- Pilih Brand Produk --</option>
+                    <option value="Make Over" {{ old('jenis_id') == 'Make Over' ? 'selected' : '' }}>Make Over</option>
+                    <option value="Mayballine" {{ old('jenis_id') == 'Mayballine' ? 'selected' : '' }}>Mayballine</option>
+                    <option value="glad2glow" {{ old('jenis_id') == 'glad2glow' ? 'selected' : '' }}>glad2glow</option>
+                    <option value="OMG" {{ old('jenis_id') == 'OMG' ? 'selected' : '' }}>OMG</option>
+                    <option value="Azzura" {{ old('jenis_id') == 'Azzura' ? 'selected' : '' }}>Azzura</option>
+                    <option value="Skintific" {{ old('jenis_id') == 'Skintific' ? 'selected' : '' }}>Skintific</option>
+                    <option value="Pixy" {{ old('jenis_id') == 'Pixy' ? 'selected' : '' }}>Pixy</option>
+                    <option value="Emina" {{ old('jenis_id') == 'Emina' ? 'selected' : '' }}>Emina</option>
+                    <option value="Wardah" {{ old('jenis_id') == 'Wardah' ? 'selected' : '' }}>Wardah</option>
+                    <option value="Pinkplash" {{ old('jenis_id') == 'Pinkplash' ? 'selected' : '' }}>Pinkplash</option>
+                    <option value="Loreal" {{ old('jenis_id') == 'Loreal' ? 'selected' : '' }}>Loreal</option>
+                    <option value="Chanel" {{ old('jenis_id') == 'Chanel' ? 'selected' : '' }}>Chanel</option>
+                    <option value="Ponds" {{ old('jenis_id') == 'Ponds' ? 'selected' : '' }}>Ponds</option>
+                    <option value="Skincare" {{ old('jenis_id') == 'Skincare' ? 'selected' : '' }}>Skincare</option>
+                </select>
+
+                @error('jenis_id')
+                    <small class="text-danger mt-1 d-block">
+                        {{ $message }}
+                    </small>
                 @enderror
             </div>
 
