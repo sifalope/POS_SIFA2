@@ -21,10 +21,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Tambahan rute Tentang Kami
+    // Rute Tentang Kami
     Route::get('/tentang-kami', function () {
         return view('tentang-kami');
     })->name('tentang.kami');
+
+    // Rute Tentang Toko (membuka file tentang-toko.blade.php)
+    Route::get('/tentang-toko', function () {
+        return view('tentang-toko');
+    })->name('tentang.toko');
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users');
@@ -47,5 +52,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('/produk', ProdukController::class);
         Route::resource('/penjualan', PenjualanController::class);
         Route::resource('/itempenjualan', ItemPenjualanController::class);
+        
+        // TAMBAHAN ROUTE STRUK
+        Route::get('/penjualan/{id}/struk', [PenjualanController::class, 'struk'])->name('penjualan.struk');
     });
 });

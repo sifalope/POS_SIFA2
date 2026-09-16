@@ -1,374 +1,356 @@
 @extends('layouts.app')
 
-@section('title', 'POS - Tambah Penjualan')
+@section('title', 'Penjualan')
 
 @section('content')
 
-<style>
-    body {
-        background-color: #fdf2f8;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #334155;
-    }
+@include('layouts.navbar')
 
-    .pos-container {
-        max-width: 1300px;
-        margin: 20px auto;
-        padding: 0 15px;
-    }
+<div class="container-fluid py-4 px-3 px-md-4 min-vh-100" style="background-color: #fdf2f8;">
 
-    .page-title {
-        color: #9d174d;
-        font-weight: 800;
-        font-size: 22px;
-        margin-bottom: 20px;
-    }
-
-    /* Card Box Custom */
-    .pink-card {
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(244, 114, 182, 0.08);
-        border: 1px solid #fbcfe8;
-        overflow: hidden;
-    }
-
-    /* Scrollbar List Produk */
-    .produk-scroll-container {
-        max-height: 70vh;
-        overflow-y: auto;
-        padding: 20px;
-    }
-
-    .produk-scroll-container::-webkit-scrollbar {
-        width: 6px;
-    }
-    .produk-scroll-container::-webkit-scrollbar-thumb {
-        background: #f472b6;
-        border-radius: 10px;
-    }
-    .produk-scroll-container::-webkit-scrollbar-track {
-        background: #fce7f3;
-    }
-
-    /* Input Search Custom */
-    .form-control-pink {
-        width: 100%;
-        padding: 10px 16px;
-        border: 1.5px solid #fbcfe8;
-        background-color: #fff5f8;
-        border-radius: 12px;
-        font-size: 14px;
-        color: #475569;
-        outline: none;
-        transition: all 0.25s ease;
-    }
-
-    .form-control-pink:focus {
-        border-color: #f472b6;
-        background-color: #ffffff;
-        box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.2);
-    }
-
-    /* Item Produk Card */
-    .produk-card-btn {
-        background: #fff5f8;
-        border: 1.5px solid #fbcfe8;
-        border-radius: 14px;
-        transition: all 0.2s ease;
-        text-align: left;
-    }
-
-    .produk-card-btn:hover:not(:disabled) {
-        border-color: #f472b6;
-        background: #ffffff;
-        box-shadow: 0 4px 12px rgba(244, 114, 182, 0.15);
-    }
-
-    /* Tombol Tambah (+) Pink */
-    .btn-pink-add {
-        background: linear-gradient(135deg, #f472b6, #ec4899);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        font-weight: bold;
-        font-size: 18px;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 10px rgba(244, 114, 182, 0.3);
-    }
-
-    .btn-pink-add:hover:not(:disabled) {
-        background: linear-gradient(135deg, #ec4899, #be185d);
-        color: white;
-    }
-
-    /* Tabel Keranjang */
-    .table-pink-cart {
-        width: 100%;
-        margin-bottom: 0;
-    }
-
-    .table-pink-cart th {
-        background-color: #fdf2f8;
-        color: #831843;
-        font-weight: 700;
-        font-size: 13px;
-        padding: 14px;
-        border-bottom: 2px solid #fbcfe8;
-    }
-
-    .table-pink-cart td {
-        padding: 12px 14px;
-        font-size: 13px;
-        border-bottom: 1px solid #fce7f3;
-        vertical-align: middle;
-    }
-
-    /* Footer / Total Section */
-    .cart-footer-pink {
-        background: #ffffff;
-        padding: 20px;
-        border-top: 2px dashed #fbcfe8;
-    }
-
-    .total-text-pink {
-        color: #831843;
-        font-size: 18px;
-        font-weight: 800;
-    }
-
-    /* Tombol Checkout & Batal */
-    .btn-checkout-pink {
-        background: linear-gradient(135deg, #f472b6, #ec4899);
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: 15px;
-        box-shadow: 0 4px 12px rgba(244, 114, 182, 0.35);
-        transition: all 0.25s ease;
-    }
-
-    .btn-checkout-pink:hover:not(:disabled) {
-        background: linear-gradient(135deg, #ec4899, #be185d);
-        color: white;
-        transform: translateY(-1px);
-    }
-
-    .btn-batal-pink {
-        background-color: #fff1f2;
-        color: #e11d48;
-        border: 1.5px solid #fecdd3;
-        padding: 11px;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: 14px;
-        transition: all 0.25s ease;
-    }
-
-    .btn-pink-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background-color: #fbcfe8;
-        color: #be185d;
-        font-weight: 600;
-        padding: 10px 20px;
-        border-radius: 10px;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border: 1px solid #f472b6;
-    }
-
-    .btn-batal-pink:hover {
-        background-color: #ffe4e6;
-        color: #be123c;
-    }
-</style>
-
-<div class="pos-container">
-
+    {{-- Alert Error jika ada --}}
     @if(session('errors'))
-        <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-3" style="background-color: #ffe4e6; color: #9f1239;">
-            {{ session('errors') }}
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4 rounded-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('errors') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
-    <h4 class="page-title">Tambah Penjualan</h4>
+    {{-- Header Halaman --}}
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h4 class="fw-bold mb-1" style="color: #831843;">
+                Tambah Penjualan
+            </h4>
+        </div>
+    </div>
 
     <div class="row g-4">
 
-        {{-- ===== PRODUK ===== --}}
+        {{-- =================== SISI KIRI: KATALOG PRODUK =================== --}}
         <div class="col-md-6">
-            <div class="pink-card">
-                <div class="produk-scroll-container">
-
-                    <div class="mb-3">
-                        <form method="GET" action="{{ route('penjualan.create') }}">
-                            <input
-                                type="text"
-                                name="search"
-                                value="{{ request('search') }}"
-                                class="form-control-pink"
-                                placeholder="Cari produk..."
-                                onkeyup="this.form.submit()">
-                        </form>
-                    </div>
-
-                    @foreach ($products as $product)
-                        <form method="POST"
-                              action="{{ route('itempenjualan.store') }}"
-                              class="row mb-3 g-2 align-items-center">
-                            @csrf
-
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-
-                            <div class="col-7">
-                                <button
-                                    type="submit"
-                                    class="btn produk-card-btn w-100 p-2 {{ $sale->status === 'COMPLETED' ? 'disabled' : '' }}"
-                                    {{ $sale->status === 'COMPLETED' ? 'disabled' : '' }}>
-                                    <div class="d-flex align-items-center gap-2">
-
-                                        <img src="{{ asset('storage/'.$product->foto) }}"
-                                             alt="Gambar"
-                                             class="rounded-3"
-                                             style="width:45px; height:45px; object-fit:cover; border: 1px solid #fbcfe8;">
-
-                                        <div>
-                                            <div class="fw-semibold text-dark" style="font-size: 14px;">{{ $product->nama }}</div>
-                                            <small style="color: #be185d; font-weight: 600;">
-                                                Rp {{ number_format($product->harga_jual) }}
-                                            </small>
-                                        </div>
-
-                                    </div>
-                                </button>
-                            </div>
-
-                            <div class="col-3">
-                                <input type="number"
-                                       name="quantity"
-                                       value="1"
-                                       min="1"
-                                       class="form-control-pink text-center"
-                                       {{ $sale->status === 'COMPLETED' ? 'readonly' : '' }}>
-                            </div>
-
-                            <div class="col-2">
-                                <button
-                                    type="submit"
-                                    class="btn btn-pink-add w-100 h-100 d-flex align-items-center justify-content-center p-2 {{ $sale->status === 'COMPLETED' ? 'disabled' : '' }}"
-                                    {{ $sale->status === 'COMPLETED' ? 'disabled' : '' }}>
-                                    +
-                                </button>
-                            </div>
-                        </form>
-                    @endforeach
-
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-3" style="background-color: #ffffff; border: 1px solid #fbcfe8 !important;">
+                
+                {{-- Search Bar Katalog --}}
+                <div class="mb-3">
+                    <form method="GET" action="{{ isset($sale) ? route('penjualan.edit', $sale->id) : route('penjualan.create') }}" id="searchForm">
+                        @if(isset($sale))
+                            <input type="hidden" name="penjualan_id" value="{{ $sale->id }}">
+                        @endif
+                        <input type="text"
+                               id="inputSearchProduk"
+                               name="search"
+                               value="{{ request('search') }}"
+                               class="form-control rounded-4 py-2 px-3 border-1 shadow-none"
+                               style="background-color: #fff5f7; border-color: #fbcfe8; color: #831843;"
+                               placeholder="Cari produk..."
+                               autocomplete="off"
+                               autofocus>
+                    </form>
                 </div>
+                
+                {{-- Daftar Katalog Produk --}}
+                <div style="max-height: 65vh; overflow-y: auto;">
+                    <div class="d-flex flex-column gap-3">
+                        @forelse($products as $product)
+                            <form method="POST" action="{{ route('itempenjualan.store') }}" class="m-0">
+                                @csrf
+                                @if(isset($sale))
+                                    <input type="hidden" name="penjualan_id" value="{{ $sale->id }}">
+                                @endif
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+                                <div class="d-flex align-items-center gap-2">
+                                    {{-- Info Produk --}}
+                                    <div class="card flex-grow-1 border-0 rounded-4 p-2 shadow-sm" style="background-color: #fff5f7; border: 1px solid #fbcfe8 !important;">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="rounded-3 overflow-hidden flex-shrink-0" style="width: 50px; height: 50px; background-color: #fff;">
+                                                @if(!empty($product->foto))
+                                                    <img src="{{ asset('storage/' . $product->foto) }}" alt="{{ $product->nama }}" class="w-100 h-100 object-fit-cover">
+                                                @elseif(!empty($product->image))
+                                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama }}" class="w-100 h-100 object-fit-cover">
+                                                @else
+                                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                                                        <i class="bi bi-image fs-4" style="color: #ec4899;"></i>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="flex-grow-1 min-w-0">
+                                                <h6 class="fw-bold mb-0 text-truncate" style="color: #831843; font-size: 0.9rem;">
+                                                    {{ $product->nama }}
+                                                </h6>
+                                                <small class="fw-bold" style="color: #ec4899;">
+                                                    Rp {{ number_format($product->harga_jual, 0, ',', '.') }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Qty Input --}}
+                                    <div style="width: 90px;">
+                                        <input type="number" name="quantity" value="1" min="1" 
+                                               class="form-control text-center rounded-4 fw-bold shadow-none" 
+                                               style="background-color: #fff5f7; border: 1px solid #fbcfe8; color: #831843; height: 48px;">
+                                    </div>
+
+                                    {{-- Tombol Tambah --}}
+                                    <button type="submit" class="btn text-white rounded-4 fw-bold px-3 d-flex align-items-center justify-content-center shadow-sm" 
+                                            style="background-color: #ec4899; height: 48px; border: none;">
+                                        <i class="bi bi-plus-lg fs-5"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        @empty
+                            <div class="text-center py-5">
+                                <p class="text-muted small mb-0">Produk tidak ditemukan.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        {{-- ===== KERANJANG ===== --}}
+        {{-- =================== SISI KANAN: KERANJANG BELANJA =================== --}}
         <div class="col-md-6">
-            <div class="pink-card">
-                <div class="table-responsive">
-                    <table class="table table-pink-cart">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 p-3" style="background-color: #ffffff; border: 1px solid #fbcfe8 !important;">
+                
+                {{-- Table Produk Keranjang --}}
+                <div class="table-responsive mb-3" style="max-height: 35vh; overflow-y: auto;">
+                    <table class="table table-borderless align-middle mb-0">
                         <thead>
-                            <tr>
+                            <tr style="color: #831843;" class="small fw-bold border-bottom">
                                 <th>Produk</th>
                                 <th>Harga</th>
-                                <th style="width: 80px;">Qty</th>
+                                <th class="text-center">Qty</th>
                                 <th>Subtotal</th>
-                                <th style="width: 60px;">Aksi</th>
+                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($sale->itempenjualan as $item)
+                            @if(isset($sale) && $sale->itemPenjualan && $sale->itemPenjualan->count() > 0)
+                                @foreach($sale->itemPenjualan as $item)
                                 <tr>
-                                    <td class="fw-semibold text-dark">{{ $item->produk->nama }}</td>
-                                    <td>Rp {{ number_format($item->produk->harga_jual) }}</td>
+                                    <td class="fw-semibold text-truncate" style="color: #831843; max-width: 120px;" title="{{ $item->produk->nama }}">
+                                        {{ $item->produk->nama }}
+                                    </td>
+                                    <td class="text-nowrap small" style="color: #831843;">
+                                        Rp {{ number_format($item->produk->harga_jual, 0, ',', '.') }}
+                                    </td>
                                     <td>
                                         <form method="POST" action="{{ route('itempenjualan.update', $item->id) }}">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="number"
-                                                   name="quantity"
+                                            @csrf @method('PUT')
+                                            <input type="number" name="quantity"
                                                    value="{{ $item->kuantitas }}"
-                                                   class="form-control-pink text-center p-1"
-                                                   style="font-size: 13px;"
+                                                   min="1"
+                                                   class="form-control form-control-sm text-center fw-bold rounded-3 shadow-none"
+                                                   style="border-color: #fbcfe8; color: #831843; background-color: #fff5f7;"
                                                    onchange="this.form.submit()">
                                         </form>
                                     </td>
-                                    <td class="fw-bold" style="color: #be185d;">Rp {{ number_format($item->subtotal) }}</td>
-                                    <td>
-                                        @can('delete',$item)
-                                            <form method="POST" action="{{ route('itempenjualan.destroy', $item->id) }}">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-danger btn-sm rounded-2 px-2 py-1" style="font-size: 12px; background-color: #f43f5e; border: none;">Hapus</button>
-                                            </form>
+                                    <td class="fw-bold text-nowrap small" style="color: #831843;">
+                                        Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                                    </td>
+                                    <td class="text-center">
+                                        @can('delete', $item)
+                                        <form method="POST" action="{{ route('itempenjualan.destroy', $item->id) }}">
+                                            @csrf @method('DELETE')
+                                            <button class="btn btn-sm rounded-circle border-0" style="color: #ec4899;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
                                         @endcan
                                     </td>
                                 </tr>
-                            @empty
+                                @endforeach
+                            @else
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">
+                                    <td colspan="5" class="text-center py-5 text-muted small">
                                         Keranjang kosong
                                     </td>
                                 </tr>
-                            @endforelse
+                            @endif
                         </tbody>
                     </table>
                 </div>
 
-                <div class="cart-footer-pink">
-                    <div class="total-text-pink mb-2">
-                        Total: Rp {{ number_format($sale->total_pembayaran) }}
+                <div class="pt-2 border-top border-dashed">
+                    {{-- Total Pembayaran --}}
+                    <div class="mb-3">
+                        <h5 class="fw-bold" style="color: #831843;">
+                            Total: <span id="totalPembayaranValue" data-total="{{ isset($sale) ? $sale->total_pembayaran : 0 }}">Rp {{ isset($sale) ? number_format($sale->total_pembayaran, 0, ',', '.') : '0' }}</span>
+                        </h5>
                     </div>
 
-                    <form method="POST" 
-                          action="{{ route('penjualan.update', $sale->id) }}"
-                          onsubmit="return confirm('Yakin ingin checkout?')" class="mt-2">
-                        @csrf
-                        @method('PUT')
-                        <select name="payment_method" class="form-control-pink mb-3">
-                            <option value="">Pilih Pembayaran</option>
-                            <option value="CASH">CASH</option>
-                            <option value="QRIS">QRIS</option>
-                        </select>
-
-                        <button class="btn btn-checkout-pink w-100" {{ $sale->status === 'COMPLETED' ? 'disabled' : '' }}>
-                            Checkout
-                        </button>
-                    </form>
-
-                    @can('delete', $sale)
-                        <form action="{{ route('penjualan.destroy', $sale->id) }}"
-                              method="POST" 
-                              onsubmit="return confirm('Yakin ingin membatalkan transaksi?')"
-                              class="mt-2">
+                    {{-- Form Pembayaran & Checkout --}}
+                    @if(isset($sale) && $sale->itemPenjualan && $sale->itemPenjualan->count() > 0)
+                        <form method="POST" action="{{ route('penjualan.update', $sale->id) }}" id="formCheckout" onsubmit="return confirm('Yakin ingin checkout transaksi ini?')">
                             @csrf
-                            @method('DELETE')
-                            <button class="btn btn-batal-pink w-100">
+                            @method('PUT')
+
+                            <div class="mb-3">
+                                <select name="metode_pembayaran" id="metodePembayaran" class="form-select rounded-4 py-2 shadow-none" style="border-color: #fbcfe8; color: #831843; background-color: #fff5f7;" required>
+                                    <option value="" disabled selected>Pilih Pembayaran</option>
+                                    <option value="CASH">Cash / Tunai</option>
+                                    <option value="QRIS">QRIS</option>
+                                </select>
+                            </div>
+
+                            {{-- Bagian Cash --}}
+                            <div id="cashSection" class="mb-3 p-3 rounded-4 shadow-sm d-none" style="background-color: #fff5f7; border: 1px solid #fbcfe8;">
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold" style="color: #831843;">Uang yang Dikasih (Cash)</label>
+                                    <input type="number" name="uang_diberikan" id="uangDiberikan" class="form-control rounded-pill shadow-none" style="border-color: #fbcfe8; color: #831843;" placeholder="Masukkan jumlah uang..">
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="small fw-bold text-muted">Uang Kembalian:</span>
+                                    <span class="fw-bold small text-success" id="uangKembalian">Rp 0</span>
+                                </div>
+                            </div>
+
+                            {{-- Bagian QRIS --}}
+                            <div id="qrisSection" class="mb-3 p-3 rounded-4 shadow-sm text-center d-none" style="background-color: #fff5f7; border: 1px solid #fbcfe8;">
+                                <span class="fw-bold d-block mb-2" style="color: #831843;">Sifa Beauty</span>
+                                <div class="bg-white p-2 rounded-3 d-inline-block shadow-sm">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=QRIS_PAYMENT" alt="QRIS" class="img-fluid rounded" style="max-width: 140px; height: auto;">
+                                </div>
+                            </div>
+
+                            {{-- Tombol Checkout --}}
+                            <div class="d-grid mb-2">
+                                <button type="submit" class="btn text-white fw-bold py-2 rounded-4 shadow-sm" style="background-color: #ec4899; border: none;">
+                                    Checkout
+                                </button>
+                            </div>
+                        </form>
+                    @else
+                        <div class="mb-3">
+                            <select class="form-select rounded-4 py-2 shadow-none" style="border-color: #fbcfe8; color: #831843; background-color: #fff5f7;" disabled>
+                                <option>Pilih Pembayaran</option>
+                            </select>
+                        </div>
+                        <div class="d-grid mb-2">
+                            <button type="button" class="btn text-white fw-bold py-2 rounded-4 shadow-sm" style="background-color: #ec4899; border: none;" disabled>
+                                Checkout
+                            </button>
+                        </div>
+                    @endif
+
+                    {{-- Tombol Batal Transaksi --}}
+                    @if(isset($sale))
+                        <div class="d-grid">
+                            <button type="button" 
+                                    class="btn rounded-4 py-2 fw-bold shadow-sm"
+                                    style="background-color: #fff5f7; color: #be185d; border: 1px solid #fbcfe8;"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#modalBatalTransaksi">
                                 Batal Transaksi
                             </button>
-                        </form>
-                    @endcan
+                        </div>
+
+                        {{-- Modal Konfirmasi Batal --}}
+                        <div class="modal fade" id="modalBatalTransaksi" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-sm">
+                                <div class="modal-content border-0 shadow-lg rounded-4" style="border: 1px solid #fbcfe8 !important;">
+                                    <div class="modal-body text-center p-4">
+                                        <div class="mb-3" style="color: #ec4899;">
+                                            <i class="bi bi-exclamation-circle fs-1"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-2" style="color: #831843;">Batalkan Transaksi?</h6>
+                                        <p class="text-muted small mb-4">Semua item di keranjang akan dihapus dan transaksi dibatalkan.</p>
+                                        
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn w-50 btn-sm fw-semibold rounded-pill border-0" style="background-color: #fff5f7; color: #831843;" data-bs-dismiss="modal">Tidak</button>
+                                            <form action="{{ route('penjualan.destroy', $sale->id) }}" method="POST" class="w-50">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn w-100 btn-sm fw-semibold rounded-pill text-white border-0" style="background-color: #ec4899;">Ya, Batalkan</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="d-grid">
+                            <button type="button" class="btn rounded-4 py-2 fw-bold shadow-sm" style="background-color: #fff5f7; color: #be185d; border: 1px solid #fbcfe8;" disabled>
+                                Batal Transaksi
+                            </button>
+                        </div>
+                    @endif
+
                 </div>
+
             </div>
         </div>
 
     </div>
 
-     <div class="mt-4">
-        <a href="{{ route('penjualan.index') }}" class="btn-pink-back">
+    {{-- Tombol Kembali --}}
+    <div class="mt-4">
+        <a href="{{ route('penjualan.index') }}" 
+           class="btn fw-semibold px-4 py-2 rounded-4 shadow-sm border-0 d-inline-flex align-items-center gap-2"
+           style="background-color: #fbcfe8; color: #831843;">
             &larr; Kembali
         </a>
     </div>
 
 </div>
 
+{{-- Skrip Interaksi Dinamis Metode Pembayaran --}}
+<script>
+    let timer;
+    const inputSearch = document.getElementById('inputSearchProduk');
+    const searchForm = document.getElementById('searchForm');
+
+    inputSearch?.addEventListener('keyup', function() {
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+            searchForm.submit();
+        }, 600);
+    });
+
+    window.onload = function() {
+        if (inputSearch) {
+            inputSearch.focus();
+            inputSearch.setSelectionRange(inputSearch.value.length, inputSearch.value.length);
+        }
+    };
+
+    document.getElementById('metodePembayaran')?.addEventListener('change', function() {
+        const cashSection = document.getElementById('cashSection');
+        const qrisSection = document.getElementById('qrisSection');
+        const inputUang = document.getElementById('uangDiberikan');
+
+        if (this.value === 'CASH') {
+            cashSection?.classList.remove('d-none');
+            qrisSection?.classList.add('d-none');
+            inputUang?.setAttribute('required', 'required');
+        } else if (this.value === 'QRIS') {
+            cashSection?.classList.add('d-none');
+            qrisSection?.classList.remove('d-none');
+            inputUang?.removeAttribute('required');
+            if(inputUang) inputUang.value = '';
+        }
+    });
+
+    document.getElementById('uangDiberikan')?.addEventListener('input', function() {
+        const total = parseFloat(document.getElementById('totalPembayaranValue').getAttribute('data-total')) || 0;
+        const bayar = parseFloat(this.value) || 0;
+        const kembalian = bayar - total;
+
+        const kembalianElem = document.getElementById('uangKembalian');
+        if (kembalianElem) {
+            if (kembalian >= 0) {
+                kembalianElem.textContent = 'Rp ' + kembalian.toLocaleString('id-ID');
+                kembalianElem.classList.remove('text-danger');
+                kembalianElem.classList.add('text-success');
+            } else {
+                kembalianElem.textContent = 'Uang kurang (Rp ' + Math.abs(kembalian).toLocaleString('id-ID') + ')';
+                kembalianElem.classList.remove('text-success');
+                kembalianElem.classList.add('text-danger');
+            }
+        }
+    });
+</script>
 @endsection

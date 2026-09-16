@@ -112,7 +112,7 @@
     <div class="login-card">
         
         <div class="login-header">
-            <h2>POS MAKE UP</h2>
+            <h2>SA Cosmetics</h2>
         </div>
 
         <div class="login-body">

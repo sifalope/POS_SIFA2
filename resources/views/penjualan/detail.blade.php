@@ -5,19 +5,16 @@
 @section('content')
 
 <style>
-  
     body {
         background-color: #fff1f7;
     }
 
-    
     .page-title {
         color: #be185d;
         font-weight: 700;
         margin-bottom: 20px;
     }
 
-   
     .card-info {
         background: #ffffff;
         border: 1px solid #fbcfe8;
@@ -31,7 +28,6 @@
         font-weight: 700;
     }
 
-   
     .table-container {
         background: #ffffff;
         border-radius: 15px;
@@ -70,7 +66,6 @@
         background-color: #fff0f6;
     }
 
-    
     .img-product {
         width: 50px;
         height: 50px;
@@ -79,7 +74,6 @@
         border: 1px solid #fbcfe8;
     }
 
-   
     .no-img-badge {
         width: 50px;
         height: 50px;
@@ -93,7 +87,6 @@
         justify-content: center;
     }
 
-    
     .btn-pink-back {
         display: inline-flex;
         align-items: center;
@@ -113,6 +106,118 @@
         color: #ffffff;
         box-shadow: 0 4px 12px rgba(190, 24, 93, 0.25);
         transform: translateY(-2px);
+    }
+
+    .btn-pink-print {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #be185d;
+        color: #ffffff;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 1px solid #be185d;
+        cursor: pointer;
+    }
+
+    .btn-pink-print:hover {
+        background-color: #9d174d;
+        box-shadow: 0 4px 12px rgba(190, 24, 93, 0.3);
+        transform: translateY(-2px);
+    }
+
+    /* FORMAT STRUK KASIR KETIKA DICETAK (PRINT) */
+    @media print {
+        @page {
+            size: 80mm auto;
+            margin: 0;
+        }
+
+        body {
+            background-color: #ffffff !important;
+            font-family: 'Courier New', Courier, monospace !important;
+            color: #000000 !important;
+            margin: 0 !important;
+            padding: 10px !important;
+            width: 80mm !important;
+        }
+
+        /* Sembunyikan elemen web yang tidak perlu */
+        .btn-pink-back, 
+        .btn-pink-print, 
+        .page-title, 
+        header, 
+        nav, 
+        .sidebar, 
+        th:nth-child(2), 
+        td:nth-child(2) { 
+            display: none !important; /* foto disembunyikan saat cetak struk */
+        }
+
+        .container {
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .card-info {
+            border: none !important;
+            box-shadow: none !important;
+            border-bottom: 1px dashed #000 !important;
+            border-radius: 0 !important;
+            padding: 0 0 10px 0 !important;
+            margin-bottom: 10px !important;
+            max-width: 100% !important;
+        }
+
+        .card-info .card-title,
+        .card-info .card-subtitle,
+        .card-info .card-text {
+            color: #000000 !important;
+            font-size: 11px !important;
+            font-weight: normal !important;
+            margin-bottom: 4px !important;
+        }
+
+        .table-container {
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            margin-top: 0 !important;
+            background: transparent !important;
+        }
+
+        .table-custom {
+            width: 100% !important;
+        }
+
+        .table-custom thead {
+            background-color: transparent !important;
+            border-bottom: 1px dashed #000 !important;
+            border-top: 1px dashed #000 !important;
+        }
+
+        .table-custom thead th {
+            color: #000000 !important;
+            padding: 5px 0 !important;
+            font-size: 11px !important;
+            text-transform: uppercase;
+        }
+
+        .table-custom tbody td, 
+        .table-custom tbody th {
+            padding: 6px 0 !important;
+            color: #000000 !important;
+            border-bottom: 1px dashed #eee !important;
+            font-size: 11px !important;
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: transparent !important;
+        }
     }
 </style>
 
@@ -164,10 +269,13 @@
         </table>
     </div>
 
-    <div class="mt-4">
+    <div class="mt-4 d-flex gap-2">
         <a href="{{ route('penjualan.index') }}" class="btn-pink-back">
             &larr; Kembali
         </a>
+        <button onclick="window.print()" class="btn-pink-print">
+            Cetak Struk
+        </button>
     </div>
 </div>
 @endsection
