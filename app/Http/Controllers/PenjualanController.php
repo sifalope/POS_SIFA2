@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SearchRequest;
+use App\Models\ItemPenjualan;
 use App\Models\Penjualan;
 use App\Models\Produk;
 use Illuminate\Http\Request;
@@ -19,14 +20,10 @@ class PenjualanController extends Controller
         $user = Auth::user();
         $keyword = $request->input('search');
 
-        $sales = Penjualan::query()
-
-            // Filter berdasarkan role
-            ->when($user->role->name === 'kasir', function ($query) use ($user) {
+        $sales = Penjualan::with('user') // Eager loading relasi user
+            ->when($user->role && $user->role->name === 'kasir', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
-
-            // Search nama user (Sudah diperbaiki typo 'whrerHas' menjadi 'whereHas')
             ->when($keyword, function ($query) use ($keyword) {
                 $query->whereHas('user', function ($q) use ($keyword) {
                     $q->where('name', 'like', '%' . $keyword . '%');
@@ -55,17 +52,18 @@ class PenjualanController extends Controller
             ]
         );
 
+        // Recalculate total pembayaran
+        $sale->update([
+            'total_pembayaran' => $sale->itemPenjualan()->sum('subtotal') ?? 0
+        ]);
+
         $keyword = $request->input('search');
 
-        if ($keyword) {
-            $products = Produk::when($keyword, function ($query) use ($keyword) {
+        $products = Produk::when($keyword, function ($query) use ($keyword) {
                 $query->where('nama', 'like', '%' . $keyword . '%');
             })
-                ->orderBy('nama')
-                ->get();
-        } else {
-            $products = Produk::orderBy('nama')->get();
-        }
+            ->orderBy('nama')
+            ->get();
 
         $mode = 'create';
 
@@ -86,8 +84,9 @@ class PenjualanController extends Controller
     public function show(Penjualan $penjualan)
     {
         $sale = $penjualan;
-
-        $sale->load('itemPenjualan');
+        
+        // Eager load itemPenjualan beserta data produk terkait
+        $sale->load('itemPenjualan.produk');
         $products = Produk::orderBy('nama')->get();
         $mode = 'view';
 
@@ -101,9 +100,9 @@ class PenjualanController extends Controller
     {
         $sale = $penjualan;
 
-        abort_if($sale->status === 'COMPLETED', 403);
+        abort_if($sale->status === 'COMPLETED', 403, 'Transaksi yang sudah selesai tidak dapat diubah.');
 
-        $sale->load('itemPenjualan');
+        $sale->load('itemPenjualan.produk');
         $products = Produk::orderBy('nama')->get();
         $mode = 'edit';
 
@@ -111,11 +110,10 @@ class PenjualanController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage (PROSES CHECKOUT).
      */
     public function update(Request $request, Penjualan $penjualan)
     {
-        // Validasi dengan pesan kustom Bahasa Indonesia
         $request->validate([
             'payment_method' => 'required|in:CASH,QRIS'
         ], [
@@ -124,16 +122,43 @@ class PenjualanController extends Controller
         ]);
 
         if ($penjualan->status !== 'OPEN') {
-            return back()->with('errors', 'Transaksi sudah diproses');
+            return back()->with('error', 'Transaksi sudah diproses.');
         }
 
         if ($penjualan->itemPenjualan()->count() === 0) {
-            return back()->with('errors', 'Keranjang masih kosong');
+            return back()->with('error', 'Keranjang masih kosong.');
         }
 
-        DB::transaction(function () use ($penjualan, $request) {
+        // =========================================================
+        // 1. TAMBAHAN VALIDASI CEK STOK SEBELUM DISIMPAN
+        // =========================================================
+        foreach ($penjualan->itemPenjualan as $item) {
+            $produk = $item->produk;
+            
+            if ($produk) {
+                // Cek nama kolom kuantitas/qty
+                $qtyDibeli = $item->kuantitas ?? $item->qty ?? 1;
 
-            // Hitung ulang total (anti manipulasi)
+                if ($qtyDibeli > $produk->stok) {
+                    $namaProduk = $produk->nama ?? $produk->name ?? 'Produk';
+                    return back()->with('error', "Stok untuk produk '{$namaProduk}' tidak mencukupi! (Sisa stok: {$produk->stok}, Dibeli: {$qtyDibeli})");
+                }
+            }
+        }
+
+        // =========================================================
+        // 2. PROSES TRANSAKSI & KURANGI STOK
+        // =========================================================
+        DB::transaction(function () use ($penjualan, $request) {
+            
+            // Kurangi stok masing-masing produk
+            foreach ($penjualan->itemPenjualan as $item) {
+                if ($item->produk) {
+                    $qtyDibeli = $item->kuantitas ?? $item->qty ?? 1;
+                    $item->produk()->decrement('stok', $qtyDibeli);
+                }
+            }
+
             $total = $penjualan->itemPenjualan()->sum('subtotal');
 
             $penjualan->update([
@@ -145,7 +170,32 @@ class PenjualanController extends Controller
 
         return redirect()
             ->route('penjualan.index')
-            ->with('success', 'Transaksi berhasil diselesaikan');
+            ->with('success', 'Transaksi berhasil diselesaikan.');
+    }
+
+    /**
+     * Hapus item tertentu dari keranjang dan rekalkulasi total pembayaran.
+     */
+    public function destroyItem(ItemPenjualan $item)
+    {
+        $penjualan = $item->penjualan;
+
+        if ($penjualan->status !== 'OPEN') {
+            return back()->with('error', 'Transaksi sudah selesai.');
+        }
+
+        DB::transaction(function () use ($item, $penjualan) {
+            // Note: Stok tidak perlu di-increment di sini jika saat tambah item ke keranjang stok belum dipotong di DB
+            $item->delete();
+
+            $newTotal = $penjualan->itemPenjualan()->sum('subtotal') ?? 0;
+
+            $penjualan->update([
+                'total_pembayaran' => $newTotal
+            ]);
+        });
+
+        return back()->with('success', 'Item berhasil dihapus dari keranjang.');
     }
 
     /**
@@ -153,27 +203,19 @@ class PenjualanController extends Controller
      */
     public function destroy(Penjualan $penjualan)
     {
-        // Pastikan hanya transaksi OPEN
         if ($penjualan->status !== 'OPEN') {
-            return redirect()->route('penjualan.index')->with('errors', 'Transaksi sudah selesai tidak bisa dibatalkan');
+            return redirect()
+                ->route('penjualan.index')
+                ->with('error', 'Transaksi yang sudah selesai tidak dapat dibatalkan.');
         }
 
         DB::transaction(function () use ($penjualan) {
-
-            foreach ($penjualan->ItemPenjualan as $item) {
-                // Kembalikan stok
-                $item->produk->increment('stok', $item->kuantitas);
-            }
-
-            // Hapus item
-            $penjualan->ItemPenjualan()->delete();
-
-            // Hapus penjualan
+            $penjualan->itemPenjualan()->delete();
             $penjualan->delete();
         });
 
         return redirect()
             ->route('penjualan.index')
-            ->with('success', 'Transaksi berhasil dibatalkan');
+            ->with('success', 'Transaksi berhasil dibatalkan.');
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Http\Requests\Produk\StoreRequest;
 use App\Http\Requests\Produk\UpdateRequest;
 use App\Http\Requests\SearchRequest;
@@ -12,9 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-
 class ProdukController extends Controller
-
 {
     /**
      * Display a listing of the resource.
@@ -71,6 +68,9 @@ class ProdukController extends Controller
         $data['harga_beli'] = $dataReq['purchase_price'];
         $data['harga_jual'] = $dataReq['selling_price'];
         $data['stok'] = $dataReq['stok'] ?? true;
+        
+        // Simpan diskon
+        $data['diskon'] = $dataReq['diskon'] ?? 0;
 
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('products', 'public');
@@ -123,6 +123,9 @@ class ProdukController extends Controller
             'harga_beli' => $dataReq['purchase_price'],
             'harga_jual' => $dataReq['selling_price'],
             'stok' => $dataReq['stok'] ?? true,
+
+            // Update diskon
+            'diskon' => $dataReq['diskon'] ?? 0,
         ];
         
         //jika upload foto baru 

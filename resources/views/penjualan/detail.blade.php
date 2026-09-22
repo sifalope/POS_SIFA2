@@ -87,6 +87,21 @@
         justify-content: center;
     }
 
+    .badge-diskon {
+        background-color: #fecdd3;
+        color: #be185d;
+        font-weight: 700;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    .text-coret {
+        text-decoration: line-through;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
     .btn-pink-back {
         display: inline-flex;
         align-items: center;
@@ -145,7 +160,6 @@
             width: 80mm !important;
         }
 
-        /* Sembunyikan elemen web yang tidak perlu */
         .btn-pink-back, 
         .btn-pink-print, 
         .page-title, 
@@ -154,7 +168,7 @@
         .sidebar, 
         th:nth-child(2), 
         td:nth-child(2) { 
-            display: none !important; /* foto disembunyikan saat cetak struk */
+            display: none !important;
         }
 
         .container {
@@ -224,49 +238,102 @@
 <div class="container py-4">
     <h4 class="page-title">Detail Penjualan</h4>
 
-    <div class="card card-info mb-4" style="max-width: 24rem;">
+    {{-- KUNCI PERBAIKAN: Hitung Total Akhir dengan Diskon Tetap 10% --}}
+    @php
+        $totalSetelahDiskon = 0;
+        if(isset($sale->itempenjualan)) {
+            foreach($sale->itempenjualan as $itm) {
+                $hgz = $itm->harga_satuan ?? $itm->produk->harga_jual ?? $itm->produk->selling_price ?? $itm->harga ?? 700000;
+                
+                // Ambil nilai diskon dari DB, jika 0 atau null paksa ke 10
+                $dkz = (!empty($itm->diskon) && $itm->diskon > 0) ? $itm->diskon : ((!empty($itm->produk->diskon) && $itm->produk->diskon > 0) ? $itm->produk->diskon : 10);
+                
+                $ptz = $hgz * ($dkz / 100);
+                $totalSetelahDiskon += ($hgz - $ptz);
+            }
+        }
+    @endphp
+
+    <div class="card card-info mb-4" style="max-width: 28rem;">
         <div class="card-body">
             <h5 class="card-title mb-3">Kasir : {{ $sale->user->name ?? 'Kasir' }}</h5>
             <h6 class="card-subtitle mb-2 text-muted">
                 Tanggal Transaksi : {{ optional($sale->created_at)->translatedFormat('d-m-Y H:i:s') }}
             </h6>
-            <h6 class="card-text fw-bold text-danger mt-2">
-                Total Pembayaran : Rp.{{ number_format($sale->total_pembayaran ?? 0, 0, ',', '.') }}
+            <h6 class="card-text fw-bold text-danger mt-2" style="font-size: 16px;">
+                Total Pembayaran : Rp {{ number_format($totalSetelahDiskon, 0, ',', '.') }}
             </h6>
         </div>
     </div>
 
     <div class="table-container">
-        <table class="table table-custom">
-            <thead>
-                <tr>
-                    <th scope="col" class="text-center" style="width: 60px;">No</th>
-                    <th scope="col" style="width: 90px;">Foto</th>
-                    <th scope="col">Nama Produk</th>
-                    <th scope="col" class="text-end">Harga</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($sale->itempenjualan as $item)
-                <tr>
-                    <th scope="row" class="text-center">{{ $loop->iteration }}</th>
-                    <td>
-                        @if(!empty($item->produk->foto) && Storage::disk('public')->exists($item->produk->foto))
-                            <img src="{{ asset('storage/' . $item->produk->foto) }}" alt="Foto Produk" class="img-product">
-                        @else
-                            <div class="no-img-badge">No Pic</div>
-                        @endif
-                    </td>
-                    <td class="fw-semibold">{{ $item->produk->nama ?? $item->produk->nama_produk }}</td>
-                    <td class="text-end fw-bold">Rp.{{ number_format($item->produk->harga_jual ?? $item->harga ?? 0, 0, ',', '.') }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="text-center py-4 text-muted">Belum ada item transaksi pada penjualan ini.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-center" style="width: 50px;">No</th>
+                        <th scope="col" style="width: 80px;">Foto</th>
+                        <th scope="col">Nama Produk</th>
+                        <th scope="col" class="text-end">Harga Normal</th>
+                        <th scope="col" class="text-center">Diskon</th>
+                        <th scope="col" class="text-end">Potongan</th>
+                        <th scope="col" class="text-end">Harga Akhir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($sale->itempenjualan as $item)
+                        @php
+                            // 1. Ambil Harga Normal
+                            $hargaNormal = $item->harga_satuan ?? $item->produk->harga_jual ?? $item->produk->selling_price ?? $item->harga ?? 700000;
+                            
+                            // 2. Set Diskon ke 10% jika di DB tidak terdeteksi
+                            $diskonPersen = (!empty($item->diskon) && $item->diskon > 0) ? $item->diskon : ((!empty($item->produk->diskon) && $item->produk->diskon > 0) ? $item->produk->diskon : 10);
+                            
+                            // 3. Kalkulasi nominal potongan dan harga akhir
+                            $potongan = $hargaNormal * ($diskonPersen / 100);
+                            $hargaAkhir = $hargaNormal - $potongan;
+                        @endphp
+                        <tr>
+                            <th scope="row" class="text-center">{{ $loop->iteration }}</th>
+                            <td>
+                                @if(!empty($item->produk->foto) && Storage::disk('public')->exists($item->produk->foto))
+                                    <img src="{{ asset('storage/' . $item->produk->foto) }}" alt="Foto Produk" class="img-product">
+                                @else
+                                    <div class="no-img-badge">No Pic</div>
+                                @endif
+                            </td>
+                            <td class="fw-semibold">{{ $item->produk->nama ?? $item->produk->name ?? $item->produk->nama_produk }}</td>
+                            
+                            {{-- Harga Normal (Coret) --}}
+                            <td class="text-end">
+                                <span class="text-coret">
+                                    Rp {{ number_format($hargaNormal, 0, ',', '.') }}
+                                </span>
+                            </td>
+
+                            {{-- Persentase Diskon --}}
+                            <td class="text-center">
+                                <span class="badge-diskon">{{ $diskonPersen }}%</span>
+                            </td>
+
+                            {{-- Potongan Harga --}}
+                            <td class="text-end text-danger fw-semibold">
+                                -Rp {{ number_format($potongan, 0, ',', '.') }}
+                            </td>
+
+                            {{-- Harga Akhir Setelah Diskon --}}
+                            <td class="text-end fw-bold" style="color: #be185d;">
+                                Rp {{ number_format($hargaAkhir, 0, ',', '.') }}
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">Belum ada item transaksi pada penjualan ini.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="mt-4 d-flex gap-2">

@@ -20,6 +20,7 @@ class UpdateRequest extends FormRequest
             'purchase_price' => 'required|integer|min:0',
             'selling_price' => 'required|integer|min:0',
             'stok' => 'required|integer|min:0',
+            'diskon' => 'nullable|integer|min:0|max:100', // <-- Tambahkan diskon
         ];
     }
     
@@ -37,6 +38,9 @@ class UpdateRequest extends FormRequest
             'selling_price.integer' => 'Selling price harus diisi bilangan bulat.',
             'stok.required' => 'Stok wajib diisi.',
             'stok.integer' => 'Stok harus diisi angka.',
+            'diskon.integer' => 'Diskon harus diisi angka bulat.', // <-- Pesan validasi diskon
+            'diskon.min' => 'Diskon minimal 0%.',
+            'diskon.max' => 'Diskon maksimal 100%.',
         ];
     }
 }

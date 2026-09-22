@@ -74,8 +74,22 @@
         pointer-events: none;
     }
 
+    .input-group-pink .percent-suffix {
+        position: absolute;
+        right: 14px;
+        color: #be185d;
+        font-weight: 700;
+        font-size: 14px;
+        pointer-events: none;
+    }
+
     .input-group-pink .form-control-pink {
         padding-left: 42px;
+    }
+
+    .input-group-pink .form-control-diskon {
+        padding-left: 16px;
+        padding-right: 42px;
     }
 
     .btn-simpan-pink {
@@ -213,6 +227,7 @@
                 <div class="input-group-pink">
                     <span class="rp-prefix">Rp</span>
                     <input type="number" 
+                           id="hargaJualInput"
                            name="selling_price" 
                            value="{{ old('selling_price', $produk->selling_price) }}" 
                            placeholder="0" 
@@ -225,7 +240,7 @@
             </div>
 
             {{-- ===== STOK ===== --}}
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="form-label-pink">Stok</label>
                 <input type="number" 
                        name="stok" 
@@ -233,6 +248,43 @@
                        placeholder="Masukkan jumlah stok" 
                        class="form-control-pink">
                 @error('stok')
+                    <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                @enderror
+            </div>
+
+            {{-- ===== DISKON PRODUK ===== --}}
+            <div class="mb-4">
+                <label class="form-label-pink">Diskon Produk</label>
+                <div class="row g-2">
+                    <div class="col-5">
+                        <select id="pilihanDiskon" class="form-control-pink">
+                            <option value="0">Tanpa Diskon (0%)</option>
+                            <option value="10">Diskon 10%</option>
+                            <option value="custom">Kustom (%)</option>
+                        </select>
+                    </div>
+                    <div class="col-7">
+                        <div class="input-group-pink">
+                            <input type="number" 
+                                   id="inputDiskonNilai"
+                                   name="diskon" 
+                                   value="{{ old('diskon', $produk->diskon ?? 0) }}" 
+                                   placeholder="0" 
+                                   min="0"
+                                   max="100"
+                                   class="form-control-pink form-control-diskon">
+                            <span class="percent-suffix">%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                {{-- Kalkulasi Harga Setelah Diskon secara Real-Time --}}
+                <div class="mt-2 p-2 rounded-3 text-end" style="background-color: #fff5f8; border: 1px dashed #fbcfe8;">
+                    <small class="text-muted">Harga Setelah Diskon: </small>
+                    <span id="labelHargaSetelahDiskon" class="fw-bold" style="color: #be185d;">Rp 0</span>
+                </div>
+
+                @error('diskon')
                     <small class="text-danger mt-1 d-block">{{ $message }}</small>
                 @enderror
             </div>
@@ -252,5 +304,54 @@
     </div>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const hargaJualInput = document.getElementById('hargaJualInput');
+        const pilihanDiskon = document.getElementById('pilihanDiskon');
+        const inputDiskonNilai = document.getElementById('inputDiskonNilai');
+        const labelHargaSetelahDiskon = document.getElementById('labelHargaSetelahDiskon');
+
+        // Deteksi nilai diskon awal
+        const initialDiskon = parseFloat(inputDiskonNilai.value) || 0;
+        if (initialDiskon === 10) {
+            pilihanDiskon.value = "10";
+            inputDiskonNilai.readOnly = true;
+        } else if (initialDiskon === 0) {
+            pilihanDiskon.value = "0";
+            inputDiskonNilai.readOnly = true;
+        } else {
+            pilihanDiskon.value = "custom";
+            inputDiskonNilai.readOnly = false;
+        }
+
+        function hitungHargaDiskon() {
+            const harga = parseFloat(hargaJualInput.value) || 0;
+            const diskon = parseFloat(inputDiskonNilai.value) || 0;
+            const hargaAkhir = harga - (harga * (diskon / 100));
+
+            labelHargaSetelahDiskon.textContent = 'Rp ' + Math.round(hargaAkhir).toLocaleString('id-ID');
+        }
+
+        pilihanDiskon.addEventListener('change', function () {
+            if (this.value === "10") {
+                inputDiskonNilai.value = 10;
+                inputDiskonNilai.readOnly = true;
+            } else if (this.value === "0") {
+                inputDiskonNilai.value = 0;
+                inputDiskonNilai.readOnly = true;
+            } else {
+                inputDiskonNilai.readOnly = false;
+            }
+            hitungHargaDiskon();
+        });
+
+        inputDiskonNilai.addEventListener('input', hitungHargaDiskon);
+        hargaJualInput.addEventListener('input', hitungHargaDiskon);
+
+        // Hitung nominal harga awal
+        hitungHargaDiskon();
+    });
+</script>
 
 @endsection
